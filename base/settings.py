@@ -1,6 +1,7 @@
 import os
 import environ
 import dj_database_url
+import django_heroku
 from pathlib import Path
 
 env = environ.Env()
@@ -19,7 +20,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["rentradarapi.herokuapp.com"]
 
 # RENDER CODE
 # RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -35,13 +36,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # third party
     "drf_yasg",
     "rest_framework",
-    # local apps
+    # local
     "authentication",
     "property",
     "user",
-    "review"
+    "review",
 ]
 
 MIDDLEWARE = [
@@ -84,9 +86,7 @@ WSGI_APPLICATION = "base.wsgi.application"
 
 # Remote Database
 DATABASES = {
-    "default": dj_database_url.config(
-        default=env("DATABASE_URL"), conn_max_age=600
-    )
+    "default": dj_database_url.config(default=env("DATABASE_URL"), conn_max_age=600)
 }
 
 # Password validation
@@ -119,6 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+django_heroku.settings(locals())
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
