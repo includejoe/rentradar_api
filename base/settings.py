@@ -16,7 +16,6 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -57,9 +56,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "base.wsgi.application"
 
-
-# Database
-
 # Local Database
 # DATABASES = {
 #     "default": {
@@ -76,7 +72,6 @@ DATABASES = {
 }
 
 # Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -94,7 +89,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -105,10 +99,8 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-
 STATIC_URL = "static/"
-MEDIA_URL = "media/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
