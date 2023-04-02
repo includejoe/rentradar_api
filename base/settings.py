@@ -1,13 +1,17 @@
-from pathlib import Path
-import dj_database_url
 import os
+import environ
+import dj_database_url
+from pathlib import Path
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "RENDER" not in os.environ
@@ -27,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
     "rest_framework",
 ]
 
@@ -71,7 +76,7 @@ WSGI_APPLICATION = "base.wsgi.application"
 # Remote Database
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"), conn_max_age=600
+        default=env("DATABASE_URL"), conn_max_age=600
     )
 }
 
@@ -108,3 +113,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Documentation
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Auth Token eg [Bearer JWT]": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    }
+}
