@@ -1,3 +1,4 @@
 env
 .env
 sandbox.py
+db.sqlite3
