@@ -65,14 +65,15 @@ class UserManager(BaseUserManager):
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=128)
     phone = models.CharField(max_length=128, default="+233")
     gender = models.CharField(max_length=56, default="other")
     dob = models.DateField(null=True)
     id_card_image = models.URLField(null=True, blank=True)
+    profile_image = models.URLField(null=True, blank=True)
     user_type = models.IntegerField(
         default=1,
         validators=[
@@ -106,8 +107,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         refresh = RefreshToken.for_user(self)
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
-    def get_full_name(self):
-        return self.first_name + self.last_name
+    @property
+    def full_name(self):
+        return self.first_name + " " + self.last_name
 
     def clean(self):
         if self.user_type <= 1:

@@ -6,12 +6,10 @@ from . import models
 class User(admin.ModelAdmin):
     list_display = (
         "id",
-        "first_name",
-        "last_name",
+        "full_name",
         "email",
         "phone",
         "gender",
-        "id_card_image",
         "user_type",
         "is_verified",
         "agent_fee",
