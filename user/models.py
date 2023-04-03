@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=128, default="+233")
     gender = models.CharField(max_length=56, default="other")
     dob = models.DateField(null=True)
-    id_card_image = models.URLField()
+    id_card_image = models.URLField(null=True, blank=True)
     user_type = models.IntegerField(
         default=1,
         validators=[

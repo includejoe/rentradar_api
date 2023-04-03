@@ -2,3 +2,4 @@ env
 .env
 sandbox.py
 db.sqlite3
+postgresdb_backup.sql
