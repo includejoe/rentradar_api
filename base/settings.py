@@ -3,6 +3,7 @@ import environ
 import dj_database_url
 import django_heroku
 from pathlib import Path
+from datetime import timedelta
 
 env = environ.Env()
 environ.Env.read_env()
@@ -20,7 +21,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["rentradarapi.herokuapp.com"]
+ALLOWED_HOSTS = ["*"]
 
 # RENDER CODE
 # RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -132,6 +133,20 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "SIGNING_KEY": env("JWT_SECRET_KEY"),
+    "ALGORITHM": env("JWT_ALGORITHM"),
+}
+
+# CORS Settings
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ["https://marketyapi.up.railway.app"]
 
 # Documentation
 SWAGGER_SETTINGS = {
