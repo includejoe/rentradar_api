@@ -42,3 +42,19 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "full_name",
+            "phone",
+            "gender",
+            "agent_fee",
+            "agent_rating",
+            "created_at",
+            "is_verified",
+            "profile_image",
+            "user_type",
+        ]
