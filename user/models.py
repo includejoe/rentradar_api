@@ -93,9 +93,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         ],
     )
     is_verified = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    user_status = models.IntegerField(
+        default=1,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(4),
+        ],
+    )
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "dob", "gender", "phone"]

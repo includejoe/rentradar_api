@@ -8,20 +8,27 @@ from user.models import User
 # Create your models here.
 class Property(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    agent = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties")
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    num_of_rooms = models.IntegerField(default=1, validators=[
-        MinValueValidator(1),
-    ])
+    num_of_rooms = models.IntegerField(
+        default=1,
+        validators=[
+            MinValueValidator(1),
+        ],
+    )
     location = models.CharField(max_length=255)
-    lease_term_in_months = models.IntegerField(default=1, validators=[
-        MinValueValidator(1),
-    ])
+    lease_term_in_months = models.IntegerField(
+        default=1,
+        validators=[
+            MinValueValidator(1),
+        ],
+    )
     is_lease_term_negotiable = models.BooleanField(default=False)
     rate = models.DecimalField(max_digits=15, decimal_places=2)
     is_rate_negotiable = models.BooleanField(default=False)
-    is_furnished = models.BooleanField(False)
+    is_furnished = models.BooleanField(default=False)
+    is_self_contain = models.BooleanField(default=False)
     image1 = models.URLField()
     image2 = models.URLField()
     image3 = models.URLField()
@@ -34,10 +41,24 @@ class Property(models.Model):
     image10 = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
-    
+
+    REQUIRED_FIELDS = [
+        "title",
+        "num_of_rooms",
+        "location",
+        "lease_term_in_months",
+        "rate",
+        "is_furnished",
+        "is_self_contain",
+        "image2",
+        "image3",
+        "image4",
+        "image5",
+    ]
+
     @property
     def totalLeaseCost(self):
         return self.lease_term_in_months * self.rate
-    
+
     class Meta:
         ordering = ["-created_at"]

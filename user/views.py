@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ParseError, APIException
+from rest_framework.exceptions import ParseError
 from rest_framework.generics import RetrieveUpdateAPIView, GenericAPIView
 
 from base.utils.jwt_decoder import decode_jwt
@@ -9,7 +9,7 @@ from .models import User
 from . import serializers
 
 # Create your views here.
-class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+class UserDetailsAPIView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.UserSerializer
 
@@ -33,7 +33,7 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-retrieve_update_user_view = UserRetrieveUpdateAPIView.as_view()
+user_details_view = UserDetailsAPIView.as_view()
 
 
 class PublicUserDetailsAPIView(GenericAPIView):
@@ -49,4 +49,4 @@ class PublicUserDetailsAPIView(GenericAPIView):
             raise ParseError(detail=e, code=401)
 
 
-get_public_user_details_view = PublicUserDetailsAPIView.as_view()
+public_user_details_view = PublicUserDetailsAPIView.as_view()

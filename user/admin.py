@@ -11,6 +11,7 @@ class User(admin.ModelAdmin):
         "phone",
         "gender",
         "user_type",
+        "user_status",
         "is_verified",
         "agent_fee",
         "agent_rating",

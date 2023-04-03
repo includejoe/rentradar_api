@@ -19,6 +19,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "gender",
             "dob",
             "user_type",
+            "user_status",
         ]
 
     def validate_email(self, value):
@@ -87,9 +88,15 @@ class LoginSerializer(serializers.ModelSerializer):
         if user is None:
             raise serializers.ValidationError("Invalid credentials")
 
-        if not user.is_active:
+        if user.user_status == 2:
             raise serializers.ValidationError(
                 "This user account is currently deactivated"
             )
+        elif user.user_status == 3:
+            raise serializers.ValidationError(
+                "This user account is currently suspended"
+            )
+        elif user.user_status == 4:
+            raise serializers.ValidationError("This user account has been deleted")
 
         return user

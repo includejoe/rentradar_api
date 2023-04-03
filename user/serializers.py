@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 
 from .models import User
 
@@ -24,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             "agent_fee",
             "agent_rating",
             "is_verified",
-            "is_active",
+            "user_status",
             "created_at",
         ]
 
@@ -39,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
 
+        instance.updated_at = timezone.now
         instance.save()
 
         return instance
