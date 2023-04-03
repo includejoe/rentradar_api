@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
 from .models import Property
+from user.serializers import PublicUserSerializer
 
 
 class PropertySerializer(serializers.ModelSerializer):
+    # user = PublicUserSerializer(many=False)
+
     class Meta:
         model = Property
         fields = [
@@ -19,6 +22,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "is_rate_negotiable",
             "is_furnished",
             "is_self_contain",
+            "total_lease_cost",
             "image1",
             "image2",
             "image3",
@@ -33,4 +37,4 @@ class PropertySerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-        read_only_fields = ["id", "user"]
+        read_only_fields = ["id", "user", "created_at", "total_lease_cost"]

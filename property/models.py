@@ -42,22 +42,8 @@ class Property(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
-    REQUIRED_FIELDS = [
-        "title",
-        "num_of_rooms",
-        "location",
-        "lease_term_in_months",
-        "rate",
-        "is_furnished",
-        "is_self_contain",
-        "image2",
-        "image3",
-        "image4",
-        "image5",
-    ]
-
     @property
-    def totalLeaseCost(self):
+    def total_lease_cost(self):
         return self.lease_term_in_months * self.rate
 
     class Meta:

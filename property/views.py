@@ -1,37 +1,86 @@
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, APIException
 from rest_framework.generics import GenericAPIView
 
+from base.utils.jwt_decoder import decode_jwt
 from . import serializers
 from .models import Property
+from user.models import User
 
 # Create your views here.
 class PostPropertyAPIView(GenericAPIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PropertySerializer
+
+    def post(self, request):
+        property_data = request.data
+        token = request.headers["AUTHORIZATION"]
+        user_id = decode_jwt(token)
+
+        image1 = property_data.get("image1", None)
+        image2 = property_data.get("image2", None)
+        image3 = property_data.get("image3", None)
+        image4 = property_data.get("image4", None)
+        image5 = property_data.get("image5", None)
+
+        if image1 is None or image1 == "":
+            raise ParseError(detail="image1 can not be null or empty")
+
+        if image2 is None or image2 == "":
+            raise ParseError(detail="image2 can not be null or empty")
+
+        if image3 is None or image3 == "":
+            raise ParseError(detail="image3 can not be null or empty")
+
+        if image4 is None or image4 == "":
+            raise ParseError(detail="image4 can not be null or empty")
+
+        if image5 is None or image5 == "":
+            raise ParseError(detail="image5 can not be null or empty")
+
+        try:
+            user = User.objects.get(id=user_id)
+            if user.user_type > 1:
+                property_data["user"] = user
+                new_property = Property(**property_data)
+                new_property.save()
+                serializer = self.serializer_class(new_property)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                raise ParseError(detail="A user of type 1 can not post a property")
+        except Exception as e:
+            raise APIException(detail=e)
 
 
 post_property_view = PostPropertyAPIView.as_view()
 
 
 class GetAllPropertiesAPIView(GenericAPIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PropertySerializer
+
+    def get(self, request):
+        properties = Property.objects.all()
+        serializer = self.serializer_class(properties, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 get_all_properties_view = GetAllPropertiesAPIView.as_view()
 
 
 class GetUserPropertiesAPIView(GenericAPIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PropertySerializer
 
 
 get_user_properties_view = GetUserPropertiesAPIView.as_view()
 
 
 class PropertyDetailAPIView(GenericAPIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PropertySerializer
 
 
 property_detail_view = PropertyDetailAPIView.as_view()
@@ -54,11 +103,7 @@ class FilterPropertiesAPIView(GenericAPIView):
 
         properties = Property.objects.all()
         if title:
-            half_length = int(len(title) / 2)
-            q = Q()
-            for i in range(half_length, len(title) + 1):
-                q |= Q(title__icontains=title[:i])
-            properties = properties.filter(q)
+            properties = properties.filter(title__icontains=title)
         if location:
             properties = properties.filter(location__icontains=location)
         if min_rate:
