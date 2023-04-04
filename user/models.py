@@ -93,6 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ],
     )
     is_verified = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False)
     user_status = models.IntegerField(
         default=1,
         validators=[

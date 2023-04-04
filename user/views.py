@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ParseError
 from rest_framework.generics import RetrieveUpdateAPIView, GenericAPIView
 
-from base.utils.jwt_decoder import decode_jwt
 from .models import User
 from . import serializers
 

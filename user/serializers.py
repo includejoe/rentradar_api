@@ -4,6 +4,12 @@ from django.utils import timezone
 from .models import User
 
 
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["full_name", "profile_image", "is_verified", "user_type"]
+
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
 

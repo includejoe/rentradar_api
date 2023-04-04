@@ -3,12 +3,7 @@ from django.utils import timezone
 
 from .models import Property
 from user.models import User
-
-
-class UserInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["full_name", "profile_image", "is_verified", "user_type"]
+from user.serializers import UserInfoSerializer
 
 
 class PropertySerializer(serializers.ModelSerializer):
