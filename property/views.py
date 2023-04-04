@@ -74,6 +74,15 @@ class GetUserPropertiesAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PropertySerializer
 
+    def get(self, _, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            properties = Property.objects.filter(user=user)
+            serializer = self.serializer_class(properties, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            raise ParseError(detail=e)
+
 
 get_user_properties_view = GetUserPropertiesAPIView.as_view()
 

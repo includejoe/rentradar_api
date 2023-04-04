@@ -11,6 +11,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "id",
             "email",
             "first_name",
             "last_name",
@@ -21,6 +22,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "user_type",
             "user_status",
         ]
+
+        read_only_fields = ["id"]
 
     def validate_email(self, value):
         valid, error_message = is_email_valid(value)
