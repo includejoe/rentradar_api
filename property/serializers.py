@@ -1,11 +1,18 @@
 from rest_framework import serializers
+from django.utils import timezone
 
 from .models import Property
-from user.serializers import PublicUserSerializer
+from user.models import User
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["full_name", "profile_image", "is_verified", "user_type"]
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    # user = PublicUserSerializer(many=False)
+    user = UserInfoSerializer(many=False)
 
     class Meta:
         model = Property
@@ -38,3 +45,12 @@ class PropertySerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = ["id", "user", "created_at", "total_lease_cost"]
+
+    def update(self, instance, validated_data):
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+
+        instance.updated_at = timezone.now
+        instance.save()
+
+        return instance

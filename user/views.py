@@ -41,12 +41,11 @@ class PublicUserDetailsAPIView(GenericAPIView):
     serializer_class = serializers.PublicUserSerializer
 
     def get(self, _, user_id):
-        try:
-            user = User.objects.get(id=user_id)
-            serializer = self.serializer_class(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            raise ParseError(detail=e, code=401)
+        if User.objects.filter(id=user_id).exists() == False:
+            raise ParseError(detail="This user does not exist", code=404)
+        user = User.objects.get(id=user_id)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 public_user_details_view = PublicUserDetailsAPIView.as_view()

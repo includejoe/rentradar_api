@@ -39,8 +39,8 @@ class Property(models.Model):
     image8 = models.URLField(null=True, blank=True)
     image9 = models.URLField(null=True, blank=True)
     image10 = models.URLField(null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+    updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def total_lease_cost(self):

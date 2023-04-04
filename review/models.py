@@ -14,7 +14,7 @@ class Review(models.Model):
         User, on_delete=models.CASCADE, related_name="reviews"
     )
     body = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
         ordering = ["-created_at"]

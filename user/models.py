@@ -101,8 +101,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ],
     )
     is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "dob", "gender", "phone"]

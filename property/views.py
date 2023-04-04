@@ -61,7 +61,7 @@ class GetAllPropertiesAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PropertySerializer
 
-    def get(self, request):
+    def get(self, _):
         properties = Property.objects.all()
         serializer = self.serializer_class(properties, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -75,13 +75,13 @@ class GetUserPropertiesAPIView(GenericAPIView):
     serializer_class = serializers.PropertySerializer
 
     def get(self, _, user_id):
-        try:
-            user = User.objects.get(id=user_id)
-            properties = Property.objects.filter(user=user)
-            serializer = self.serializer_class(properties, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            raise ParseError(detail=e)
+        if User.objects.filter(id=user_id).exists() == False:
+            raise ParseError(detail="This user does not exist", code=404)
+
+        user = User.objects.get(id=user_id)
+        properties = Property.objects.filter(user=user)
+        serializer = self.serializer_class(properties, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 get_user_properties_view = GetUserPropertiesAPIView.as_view()
@@ -90,6 +90,56 @@ get_user_properties_view = GetUserPropertiesAPIView.as_view()
 class PropertyDetailAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PropertySerializer
+
+    def get(self, _, property_id):
+        if Property.objects.filter(id=property_id).exists() == False:
+            raise ParseError(detail="This property does not exist", code=404)
+
+        property = Property.objects.get(id=property_id)
+        serializer = self.serializer_class(property)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, property_id):
+        token = request.headers["AUTHORIZATION"]
+        user_id = decode_jwt(token)
+        property_owner = User.objects.get(id=user_id)
+
+        if Property.objects.filter(id=property_id).exists() == False:
+            raise ParseError(detail="This property does not exist", code=404)
+
+        property_to_delete = Property.objects.get(id=property_id)
+
+        if property_to_delete.user.id != property_owner.id:
+            raise ParseError(detail="This user does not own this property", code=401)
+
+        property_to_delete.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, property_id):
+        token = request.headers["AUTHORIZATION"]
+        user_id = decode_jwt(token)
+        property_data = request.data
+        property_owner = User.objects.get(id=user_id)
+
+        if Property.objects.filter(id=property_id).exists() == False:
+            raise ParseError(detail="This property does not exist", code=404)
+
+        property_to_update = Property.objects.get(id=property_id)
+
+        if property_to_update.user.id != property_owner.id:
+            raise ParseError(detail="This user does not own this property", code=401)
+
+        serializer = self.serializer_class(
+            property_to_update,
+            data=property_data,
+            partial=True,
+            context={"request": request},
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 property_detail_view = PropertyDetailAPIView.as_view()
