@@ -40,7 +40,7 @@ class PublicUserDetailsAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PublicUserSerializer
 
-    def get(self, request, user_id):
+    def get(self, _, user_id):
         try:
             user = User.objects.get(id=user_id)
             serializer = self.serializer_class(user)
