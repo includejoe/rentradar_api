@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from . import models
 
+
 # Register your models here.
 class User(admin.ModelAdmin):
     list_display = (
@@ -13,8 +14,7 @@ class User(admin.ModelAdmin):
         "user_type",
         "user_status",
         "is_verified",
-        "agent_fee",
-        "agent_rating",
+        "rating",
     )
 
 

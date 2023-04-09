@@ -6,9 +6,10 @@ from rest_framework.generics import GenericAPIView
 
 from base.utils.jwt_decoder import decode_jwt
 from . import serializers
-from .models import UserReview, PropertyReview
+from .models import UserReview, RentalReview
 from user.models import User
-from property.models import Property
+from rental.models import Rental
+
 
 # Create your views here.
 class CreateUserReviewAPIView(GenericAPIView):
@@ -57,9 +58,9 @@ class DeleteUserReviewAPIView(GenericAPIView):
 delete_user_review_view = DeleteUserReviewAPIView.as_view()
 
 
-class CreatePropertyReviewAPIView(GenericAPIView):
+class CreateRentalReviewAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.CreatePropertyReviewSerializer
+    serializer_class = serializers.CreateRentalReviewSerializer
 
     def post(self, request):
         token = request.headers["AUTHORIZATION"]
@@ -73,26 +74,26 @@ class CreatePropertyReviewAPIView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-create_property_review_view = CreatePropertyReviewAPIView.as_view()
+create_rental_review_view = CreateRentalReviewAPIView.as_view()
 
 
-class GetPropertyReviewsAPIView(GenericAPIView):
+class GetRentalReviewsAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.PropertyReviewSerializer
+    serializer_class = serializers.RentalReviewSerializer
 
-    def get(self, request, property_id):
+    def get(self, request, rental_id):
         pass
 
 
-get_property_reviews_view = GetPropertyReviewsAPIView.as_view()
+get_rental_reviews_view = GetRentalReviewsAPIView.as_view()
 
 
-class DeletePropertyReviewAPIView(GenericAPIView):
+class DeleteRentalReviewAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.PropertyReviewSerializer
+    serializer_class = serializers.RentalReviewSerializer
 
     def delete(self, request, review_id):
         pass
 
 
-delete_property_review_view = DeletePropertyReviewAPIView.as_view()
+delete_rental_review_view = DeleteRentalReviewAPIView.as_view()

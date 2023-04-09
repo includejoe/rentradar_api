@@ -3,9 +3,9 @@ from .views import (
     create_user_review_view,
     get_user_reviews_view,
     delete_user_review_view,
-    create_property_review_view,
-    get_property_reviews_view,
-    delete_property_review_view,
+    create_rental_review_view,
+    get_rental_reviews_view,
+    delete_rental_review_view,
 )
 
 app_name = "review"
@@ -18,17 +18,15 @@ urlpatterns = [
         delete_user_review_view,
         name="delete_user_review",
     ),
+    path("rental/create/", create_rental_review_view, name="create_rental_review"),
     path(
-        "property/create/", create_property_review_view, name="create_property_review"
+        "rental/all/<str:rental_id>/",
+        get_rental_reviews_view,
+        name="get_rental_reviews",
     ),
     path(
-        "property/all/<str:property_id>/",
-        get_property_reviews_view,
-        name="get_property_reviews",
-    ),
-    path(
-        "property/delete/<str:review_id>/",
-        delete_property_review_view,
-        name="delete_property_review",
+        "rental/delete/<str:review_id>/",
+        delete_rental_review_view,
+        name="delete_rental_review",
     ),
 ]

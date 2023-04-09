@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import PropertyReview, UserReview
+from .models import RentalReview, UserReview
 from user.serializers import UserInfoSerializer
 
 
@@ -22,19 +22,19 @@ class UserReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at"]
 
 
-class CreatePropertyReviewSerializer(serializers.ModelSerializer):
+class CreateRentalReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PropertyReview
+        model = RentalReview
         fields = "__all__"
 
         read_only_fields = ["id", "created_at"]
 
 
-class PropertyReviewSerializer(serializers.ModelSerializer):
+class RentalReviewSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(many=False)
 
     class Meta:
-        model = PropertyReview
+        model = RentalReview
         fields = "__all__"
 
         read_only_fields = ["id", "created_at"]

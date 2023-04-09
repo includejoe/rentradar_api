@@ -68,23 +68,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
+    bus_name = models.CharField(max_length=128)
     password = models.CharField(max_length=128)
     phone = models.CharField(max_length=128, default="+233")
     gender = models.CharField(max_length=56, default="other")
     dob = models.DateField(null=True)
+    location = models.CharField(max_length=255)
     id_card_image = models.URLField(null=True, blank=True)
     profile_image = models.URLField(null=True, blank=True)
-    user_type = models.IntegerField(
-        default=1,
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(3),
-        ],
-    )
-    agent_fee = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
-    agent_rating = models.IntegerField(
+    is_verified = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    rating = models.IntegerField(
         null=True,
         blank=True,
         validators=[
@@ -92,8 +87,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             MaxValueValidator(5),
         ],
     )
-    is_verified = models.BooleanField(default=False)
-    is_premium = models.BooleanField(default=False)
+    user_type = models.IntegerField(
+        default=1,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(3),
+        ],
+    )
     user_status = models.IntegerField(
         default=1,
         validators=[
@@ -101,7 +101,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             MaxValueValidator(4),
         ],
     )
-    is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -120,12 +119,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name + " " + self.last_name
 
     def clean(self):
-        if self.user_type <= 1:
-            if self.agent_fee is not None:
+        if self.user_type == 1:
+            if self.rating is not None:
                 raise ValidationError(
-                    {"agent_fee": "This field must be null for a non agent user"}
+                    {"rating": "This field must be null for a user of type 1"}
                 )
-            if self.agent_rating is not None:
+
+        if self.user_type == 2:
+            if self.bus_name is None:
                 raise ValidationError(
-                    {"agent_rating": "This field must be null for a non agent user"}
+                    {"bus_name": "This field can not be null for a user of type 2"}
                 )

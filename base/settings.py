@@ -1,6 +1,7 @@
 import os
 import environ
-import dj_database_url
+
+# import dj_database_url
 import django_heroku
 from pathlib import Path
 from datetime import timedelta
@@ -33,7 +34,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # local
     "authentication",
-    "property",
+    "rental",
     "user",
     "review",
 ]
@@ -77,9 +78,22 @@ WSGI_APPLICATION = "base.wsgi.application"
 # }
 
 # Remote Database
+# Using a Database URL
+# DATABASES = {
+#     "default": dj_database_url.config(default=env("DATABASE_URL"), conn_max_age=600)
+# }
+
 DATABASES = {
-    "default": dj_database_url.config(default=env("DATABASE_URL"), conn_max_age=600)
+    "default": {
+        "ENGINE": env("DATABASE_ENGINE"),
+        "HOST": env("DATABASE_HOST"),
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "PASSWORD": env("DATABASE_PASSWORD"),
+        "PORT": env("DATABASE_PORT"),
+    }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

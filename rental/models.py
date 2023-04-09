@@ -1,34 +1,30 @@
 import uuid
 from django.db import models
-from django.core.validators import MinValueValidator
 from django.utils import timezone
 
 from user.models import User
 
+
 # Create your models here.
-class Property(models.Model):
+class Rental(models.Model):
+    CATEGORY_CHOICES = (
+        ("real-estate", "real-estate"),
+        ("vehicles", "vehicles"),
+        ("event-supplies", "event-supplies"),
+        ("fashion", "fashion"),
+        ("recreational", "recreational"),
+        ("sports", "sports"),
+        ("electronics", "electronics"),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rentals")
     title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    num_of_rooms = models.IntegerField(
-        default=1,
-        validators=[
-            MinValueValidator(1),
-        ],
-    )
     location = models.CharField(max_length=255)
-    lease_term_in_months = models.IntegerField(
-        default=1,
-        validators=[
-            MinValueValidator(1),
-        ],
-    )
-    is_lease_term_negotiable = models.BooleanField(default=False)
+    description = models.TextField(null=False, blank=False)
+    category = models.CharField(max_length=64, choices=CATEGORY_CHOICES)
     rate = models.DecimalField(max_digits=15, decimal_places=2)
-    is_rate_negotiable = models.BooleanField(default=False)
-    is_furnished = models.BooleanField(default=False)
-    is_self_contain = models.BooleanField(default=False)
+    total_lease_cost = models.DecimalField(max_digits=15, decimal_places=2)
     image1 = models.URLField()
     image2 = models.URLField()
     image3 = models.URLField()
@@ -41,10 +37,6 @@ class Property(models.Model):
     image10 = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
-
-    @property
-    def total_lease_cost(self):
-        return self.lease_term_in_months * self.rate
 
     class Meta:
         ordering = ["-created_at"]

@@ -7,7 +7,7 @@ from .models import User
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["full_name", "profile_image", "is_verified", "user_type"]
+        fields = ["full_name", "bus_name", "profile_image", "is_verified", "user_type"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,6 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
+            "bus_name",
+            "location",
             "password",
             "phone",
             "gender",
@@ -28,8 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id_card_image",
             "profile_image",
             "user_type",
-            "agent_fee",
-            "agent_rating",
+            "rating",
             "is_verified",
             "user_status",
             "created_at",
@@ -40,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         password = validated_data.get("password", None)
 
-        for (key, value) in validated_data.items():
+        for key, value in validated_data.items():
             setattr(instance, key, value)
 
         if password is not None:
@@ -57,10 +58,11 @@ class PublicUserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "full_name",
+            "bus_name",
             "phone",
             "gender",
-            "agent_fee",
-            "agent_rating",
+            "location",
+            "rating",
             "created_at",
             "is_verified",
             "profile_image",
