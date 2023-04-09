@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
         self,
         first_name,
         last_name,
+        bus_name,
         email,
         gender,
         dob,
@@ -31,6 +32,7 @@ class UserManager(BaseUserManager):
         user = self.model(email=self.normalize_email(email))
         user.first_name = first_name
         user.last_name = last_name
+        user.bus_name = bus_name
         user.gender = gender
         user.dob = dob
         user.phone = phone
@@ -68,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    bus_name = models.CharField(max_length=128)
+    bus_name = models.CharField(max_length=128, null=True)
     password = models.CharField(max_length=128)
     phone = models.CharField(max_length=128, default="+233")
     gender = models.CharField(max_length=56, default="other")
@@ -125,8 +127,5 @@ class User(AbstractBaseUser, PermissionsMixin):
                     {"rating": "This field must be null for a user of type 1"}
                 )
 
-        if self.user_type == 2:
-            if self.bus_name is None:
-                raise ValidationError(
-                    {"bus_name": "This field can not be null for a user of type 2"}
-                )
+    class Meta:
+        ordering = ["-created_at"]

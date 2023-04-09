@@ -15,6 +15,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "bus_name",
             "password",
             "phone",
             "gender",
@@ -40,10 +41,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        bus_name = data.get("bus_name", None)
         gender = data.get("gender", None)
         dob = data.get("dob", None)
         phone = data.get("phone", None)
         user_type = data.get("user_type", None)
+
+        if user_type == 2 and bus_name is None:
+            raise serializers.ValidationError(
+                "bus_name can not be null for a user of type 2"
+            )
 
         if gender is None:
             raise serializers.ValidationError("gender is required")

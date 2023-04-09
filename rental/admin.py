@@ -11,7 +11,8 @@ class Rental(admin.ModelAdmin):
         "category",
         "location",
         "rate",
-        "total_lease_cost",
+        "lease_term",
+        "lease_cost",
         "created_at",
     )
 

@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from user.models import User
 
@@ -19,17 +20,20 @@ class Rental(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rentals")
-    title = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    description = models.TextField(null=False, blank=False)
-    category = models.CharField(max_length=64, choices=CATEGORY_CHOICES)
-    rate = models.DecimalField(max_digits=15, decimal_places=2)
-    total_lease_cost = models.DecimalField(max_digits=15, decimal_places=2)
-    image1 = models.URLField()
-    image2 = models.URLField()
-    image3 = models.URLField()
-    image4 = models.URLField()
-    image5 = models.URLField()
+    title = models.CharField(max_length=255, blank=False, null=False)
+    location = models.CharField(max_length=255, blank=False, null=False)
+    description = models.TextField(blank=False, null=False)
+    category = models.CharField(
+        max_length=64, choices=CATEGORY_CHOICES, blank=False, null=False
+    )
+    rate = models.CharField(max_length=128, blank=False, null=False)
+    lease_term = models.CharField(max_length=255, blank=False, null=False)
+    lease_cost = models.CharField(max_length=128, blank=False, null=False)
+    image1 = models.URLField(blank=False, null=False)
+    image2 = models.URLField(blank=False, null=False)
+    image3 = models.URLField(blank=False, null=False)
+    image4 = models.URLField(blank=False, null=False)
+    image5 = models.URLField(blank=False, null=False)
     image6 = models.URLField(null=True, blank=True)
     image7 = models.URLField(null=True, blank=True)
     image8 = models.URLField(null=True, blank=True)

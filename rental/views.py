@@ -13,39 +13,22 @@ from user.models import User
 # Create your views here.
 class CreateRentalAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.RentalSerializer
+    serializer_class = serializers.CreateRentalSerializer
 
     def post(self, request):
         rental_data = request.data
         token = request.headers["AUTHORIZATION"]
         user_id = decode_jwt(token)
 
-        image1 = rental_data.get("image1", None)
-        image2 = rental_data.get("image2", None)
-        image3 = rental_data.get("image3", None)
-        image4 = rental_data.get("image4", None)
-        image5 = rental_data.get("image5", None)
-
-        if image1 is None or image1 == "":
-            raise ParseError(detail="image1 can not be null or empty")
-
-        if image2 is None or image2 == "":
-            raise ParseError(detail="image2 can not be null or empty")
-
-        if image3 is None or image3 == "":
-            raise ParseError(detail="image3 can not be null or empty")
-
-        if image4 is None or image4 == "":
-            raise ParseError(detail="image4 can not be null or empty")
-
-        if image5 is None or image5 == "":
-            raise ParseError(detail="image5 can not be null or empty")
-
         try:
             user = User.objects.get(id=user_id)
             if user.user_type > 1:
                 rental_data["user"] = user
                 new_rental = Rental(**rental_data)
+
+                # perform validation
+                new_rental.full_clean()
+
                 new_rental.save()
                 serializer = self.serializer_class(new_rental)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
