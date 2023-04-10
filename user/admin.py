@@ -19,3 +19,10 @@ class User(admin.ModelAdmin):
 
 
 admin.site.register(models.User, User)
+
+
+class Rating(admin.ModelAdmin):
+    list_display = ("id", "value")
+
+
+admin.site.register(models.Rating, Rating)

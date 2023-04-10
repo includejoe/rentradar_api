@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils import timezone
 
-from .models import User
+from .models import User, Rating
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -68,3 +68,10 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "profile_image",
             "user_type",
         ]
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ("id", "user_rated", "rater", "value")
+        read_only_fields = ("id", "user_rated", "rater")

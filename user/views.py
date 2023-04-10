@@ -2,13 +2,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ParseError
-from rest_framework.generics import RetrieveUpdateAPIView, GenericAPIView
+from rest_framework import generics
 
-from .models import User
+from .models import User, Rating
 from . import serializers
 
+
 # Create your views here.
-class UserDetailsAPIView(RetrieveUpdateAPIView):
+class UserDetailsAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.UserSerializer
 
@@ -35,7 +36,7 @@ class UserDetailsAPIView(RetrieveUpdateAPIView):
 user_details_view = UserDetailsAPIView.as_view()
 
 
-class PublicUserDetailsAPIView(GenericAPIView):
+class PublicUserDetailsAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PublicUserSerializer
 
@@ -48,3 +49,48 @@ class PublicUserDetailsAPIView(GenericAPIView):
 
 
 public_user_details_view = PublicUserDetailsAPIView.as_view()
+
+
+class RateUserAPIView(generics.CreateAPIView):
+    serializer_class = serializers.RatingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        user_id = self.kwargs.get("user_id")
+        rater = request.user
+        value = request.data.get("value")
+
+        if not value or not (1 <= value <= 5):
+            return Response(
+                {"detail": "Invalid rating value. Rating value must range from 1 to 5"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_rated = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "The user you are trying to rate does not exist."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if user_rated == rater:
+            return Response(
+                {"detail": "A user can not rate itself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        rating, created = Rating.objects.get_or_create(
+            rater=rater, user_rated=user_rated, defaults={"value": value}
+        )
+
+        if not created:
+            rating.value = value
+            rating.save()
+
+        serializer = self.serializer_class(rating)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+rate_user_view = RateUserAPIView.as_view()

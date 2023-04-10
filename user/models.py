@@ -16,11 +16,11 @@ class UserManager(BaseUserManager):
         self,
         first_name,
         last_name,
-        bus_name,
         email,
         gender,
         dob,
         phone,
+        bus_name=None,
         user_type=1,
         password=None,
         is_superuser=False,
@@ -81,22 +81,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    rating = models.IntegerField(
-        null=True,
-        blank=True,
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5),
-        ],
-    )
-    user_type = models.IntegerField(
+    user_type = models.PositiveSmallIntegerField(
         default=1,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(3),
         ],
     )
-    user_status = models.IntegerField(
+    user_status = models.PositiveSmallIntegerField(
         default=1,
         validators=[
             MinValueValidator(1),
@@ -120,6 +112,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return self.first_name + " " + self.last_name
 
+    @property
+    def rating(self):
+        rating_sum = 0
+        rating_count = 0
+        for rating in self.ratings_received.all():
+            rating_sum += rating.value
+            rating_count += 1
+        if rating_count > 0:
+            return rating_sum / rating_count
+        else:
+            return 0.0
+
     def clean(self):
         if self.user_type == 1:
             if self.rating is not None:
@@ -129,3 +133,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class Rating(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    rater = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="ratings_given"
+    )
+    user_rated = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="ratings_received"
+    )
+    value = models.PositiveSmallIntegerField(
+        default=1,
+        blank=True,
+        null=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ],
+    )
