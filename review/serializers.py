@@ -9,7 +9,7 @@ class CreateUserReviewSerializer(serializers.ModelSerializer):
         model = UserReview
         fields = "__all__"
 
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "user"]
 
 
 class UserReviewSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class UserReviewSerializer(serializers.ModelSerializer):
         model = UserReview
         fields = "__all__"
 
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "user", "user_reviewed", "body"]
 
 
 class CreateRentalReviewSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class CreateRentalReviewSerializer(serializers.ModelSerializer):
         model = RentalReview
         fields = "__all__"
 
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "user"]
 
 
 class RentalReviewSerializer(serializers.ModelSerializer):
@@ -37,4 +37,4 @@ class RentalReviewSerializer(serializers.ModelSerializer):
         model = RentalReview
         fields = "__all__"
 
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "user", "rental_review", "body"]

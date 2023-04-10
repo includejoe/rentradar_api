@@ -76,7 +76,7 @@ class RateUserAPIView(generics.CreateAPIView):
 
         if user_rated == rater:
             return Response(
-                {"detail": "A user can not rate itself"},
+                {"detail": "Users can not rate themselves"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
