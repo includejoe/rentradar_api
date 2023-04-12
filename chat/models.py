@@ -18,13 +18,13 @@ class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class Message(models.model):
+class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     sender = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="message_sender"
     )
-    text = models.CharField(blank=True)
+    text = models.CharField(blank=True, max_length=1024)
     attachment = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

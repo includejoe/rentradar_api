@@ -33,7 +33,12 @@ class StartConversationAPIView(generics.CreateAPIView):
         )
 
         if conversation.exists():
-            return redirect(reverse("get_conversation", args=[conversation[0].id]))
+            return redirect(
+                reverse(
+                    "chat:get_conversation",
+                    kwargs={"conversation_id": str(conversation[0].id)},
+                )
+            )
         else:
             conversation = Conversation.objects.create(
                 initiator=request.user, receiver=receiver
@@ -66,7 +71,7 @@ class GetConversationListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.ConversationListSerializer
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
         conversation_list = Conversation.objects.filter(
             Q(initiator=request.user) | Q(receiver=request.user)
         )
