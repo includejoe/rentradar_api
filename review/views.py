@@ -66,7 +66,18 @@ class DeleteUserReviewAPIView(generics.GenericAPIView):
     serializer_class = serializers.UserReviewSerializer
 
     def delete(self, request, review_id):
-        pass
+        review_owner = request.user
+
+        if not UserReview.objects.filter(id=review_id).exists():
+            raise ParseError(detail="This user review does not exist", code=404)
+
+        review_to_delete = UserReview.objects.get(id=review_id)
+
+        if review_to_delete.user != review_owner:
+            raise ParseError(detail="This user does not own this review", code=401)
+
+        review_to_delete.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 delete_user_review_view = DeleteUserReviewAPIView.as_view()
@@ -124,7 +135,18 @@ class DeleteRentalReviewAPIView(generics.GenericAPIView):
     serializer_class = serializers.RentalReviewSerializer
 
     def delete(self, request, review_id):
-        pass
+        review_owner = request.user
+
+        if not RentalReview.objects.filter(id=review_id).exists():
+            raise ParseError(detail="This rental review does not exist", code=404)
+
+        review_to_delete = RentalReview.objects.get(id=review_id)
+
+        if review_to_delete.user != review_owner:
+            raise ParseError(detail="This user does not own this review", code=401)
+
+        review_to_delete.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 delete_rental_review_view = DeleteRentalReviewAPIView.as_view()
