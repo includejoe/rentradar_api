@@ -48,8 +48,14 @@ class GetUserReviewsAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.UserReviewSerializer
 
-    def get(self, request, user_id):
-        pass
+    def get(self, _, user_id):
+        if User.objects.filter(id=user_id).exists() == False:
+            raise ParseError(detail="This user does not exist", code=404)
+
+        user_reviewed = User.objects.get(id=user_id)
+        reviews = UserReview.objects.filter(user_reviewed=user_reviewed)
+        serializer = self.serializer_class(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 get_user_reviews_view = GetUserReviewsAPIView.as_view()
@@ -99,8 +105,15 @@ class GetRentalReviewsAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.RentalReviewSerializer
 
-    def get(self, request, rental_id):
-        pass
+    def get(self, _, rental_id):
+        print(rental_id)
+        if Rental.objects.filter(id=rental_id).exists() == False:
+            raise ParseError(detail="This rental does not exist", code=404)
+
+        rental_reviewed = Rental.objects.get(id=rental_id)
+        reviews = RentalReview.objects.filter(rental_reviewed=rental_reviewed)
+        serializer = self.serializer_class(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 get_rental_reviews_view = GetRentalReviewsAPIView.as_view()
