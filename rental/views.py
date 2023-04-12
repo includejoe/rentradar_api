@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ParseError, APIException
 from rest_framework.generics import GenericAPIView
 
-from base.utils.jwt_decoder import decode_jwt
 from . import serializers
 from .models import Rental
 from user.models import User
@@ -17,11 +16,9 @@ class CreateRentalAPIView(GenericAPIView):
 
     def post(self, request):
         rental_data = request.data
-        token = request.headers["AUTHORIZATION"]
-        user_id = decode_jwt(token)
+        user = request.user
 
         try:
-            user = User.objects.get(id=user_id)
             if user.user_type > 1:
                 rental_data["user"] = user
                 new_rental = Rental(**rental_data)
@@ -84,9 +81,7 @@ class RentalDetailAPIView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, rental_id):
-        token = request.headers["AUTHORIZATION"]
-        user_id = decode_jwt(token)
-        rental_owner = User.objects.get(id=user_id)
+        rental_owner = request.user
 
         if Rental.objects.filter(id=rental_id).exists() == False:
             raise ParseError(detail="This rental does not exist", code=404)
@@ -100,10 +95,8 @@ class RentalDetailAPIView(GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, rental_id):
-        token = request.headers["AUTHORIZATION"]
-        user_id = decode_jwt(token)
+        rental_owner = request.user
         rental_data = request.data
-        rental_owner = User.objects.get(id=user_id)
 
         if Rental.objects.filter(id=rental_id).exists() == False:
             raise ParseError(detail="This rental does not exist", code=404)

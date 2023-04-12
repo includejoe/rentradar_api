@@ -1,10 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ParseError, APIException
+from rest_framework.exceptions import ParseError
 from rest_framework import generics
 
-from base.utils.jwt_decoder import decode_jwt
 from . import serializers
 from .models import UserReview, RentalReview
 from user.models import User
