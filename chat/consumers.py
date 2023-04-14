@@ -1,22 +1,19 @@
 import json
-import secrets
-from datetime import datetime
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 
-from user.models import User
 from .models import Message, Conversation
-from .serializers import MessageSerializer
+from .serializers import GetMessageSerializer
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_name = self.scope["url_route"]["kwargs"]["conversation_id"]
         self.room_group_name = f"chat{self.room_name}"
 
         # Join room group
-        async_to_sync(self.channel_layer.group_app)(
+        async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
 
@@ -63,7 +60,7 @@ class ChatConsumer(WebsocketConsumer):
                 sender=sender, text=message_text, conversation=conversation
             )
 
-        serializer = MessageSerializer(message)
+        serializer = GetMessageSerializer(message)
 
         # Send message to WebSocket
         self.send(text_data=json.dumps(serializer.data))

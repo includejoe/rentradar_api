@@ -23,6 +23,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -168,8 +169,8 @@ SWAGGER_SETTINGS = {
     }
 }
 
-
-ASGI_APPLICATION = "base.wsgi.application"
+# Daphne
+ASGI_APPLICATION = "base.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {

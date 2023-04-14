@@ -1,10 +1,27 @@
+import uuid
 from rest_framework import serializers
 
+from user.models import User
 from .models import Message, Conversation
 from user.serializers import UserInfoSerializer
 
 
+class UserID(serializers.Field):
+    def to_representation(self, value):
+        if isinstance(value, User):
+            return str(value.id)
+        return value
+
+
 class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        exclude = ("conversation",)
+
+
+class GetMessageSerializer(serializers.ModelSerializer):
+    sender = UserID()
+
     class Meta:
         model = Message
         exclude = ("conversation",)
