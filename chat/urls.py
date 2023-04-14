@@ -8,7 +8,9 @@ from .views import (
 app_name = "chat"
 
 urlpatterns = [
-    path("start/", start_conversation_view, name="start_conversation"),
+    path(
+        "start/<str:receiver_id>/", start_conversation_view, name="start_conversation"
+    ),
     path("<str:conversation_id>/", get_conversation_view, name="get_conversation"),
     path("", get_conversation_list_view, name="get_conversation_list"),
 ]

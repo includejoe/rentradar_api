@@ -12,14 +12,11 @@ from user.models import User
 
 
 # Create your views here.
-class StartConversationAPIView(generics.CreateAPIView):
+class StartConversationAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.ConversationSerializer
 
-    def create(self, request):
-        data = request.data
-        receiver_id = data.pop("receiver")
-
+    def retrieve(self, request, receiver_id):
         try:
             receiver = User.objects.get(id=receiver_id)
         except User.DoesNotExist:
@@ -37,7 +34,8 @@ class StartConversationAPIView(generics.CreateAPIView):
                 reverse(
                     "chat:get_conversation",
                     kwargs={"conversation_id": str(conversation[0].id)},
-                )
+                ),
+                method="GET",
             )
         else:
             conversation = Conversation.objects.create(
