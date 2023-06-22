@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     "channels",
     "corsheaders",
     # local
-    "authentication",
     "rental",
     "user",
     "review",
