@@ -8,11 +8,23 @@ from base.utils.email_validator import is_email_valid
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=6, write_only=True)
+    first_name = serializers.CharField(max_length=128, write_only=True)
+    last_name = serializers.CharField(max_length=128, write_only=True)
+    bus_name = serializers.CharField(max_length=128, write_only=True, required=False)
+    gender = serializers.CharField(max_length=12, write_only=True)
+    phone = serializers.CharField(max_length=128, write_only=True)
+    dob = serializers.CharField(max_length=32, write_only=True)
+    password = serializers.CharField(max_length=128, min_length=6, write_only=True)
+    user_type = serializers.IntegerField(write_only=True)
+    jwt = serializers.SerializerMethodField()
+
+    def get_jwt(self, obj):
+        user = User.objects.get(email=obj.email)
+        return user.tokens["access"]
 
     class Meta:
         model = User
         fields = [
-            "id",
             "email",
             "first_name",
             "last_name",
@@ -22,10 +34,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "gender",
             "dob",
             "user_type",
-            "user_status",
+            "jwt",
         ]
-
-        read_only_fields = ["id"]
 
     def validate_email(self, value):
         valid, error_message = is_email_valid(value)
