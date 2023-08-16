@@ -85,16 +85,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=1,
         validators=[
             MinValueValidator(1),
-            MaxValueValidator(3),
+            MaxValueValidator(2),
         ],
-    )
+    )  # 1 -> Regular User, 2 -> Business/Property Owner
     user_status = models.PositiveSmallIntegerField(
         default=1,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(4),
         ],
-    )
+    )  # 1 -> Active, 2 -> Deactivated, 3 -> Suspended, 4 -> Deleted
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
