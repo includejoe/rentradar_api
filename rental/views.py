@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import ParseError, APIException
 from rest_framework.generics import GenericAPIView
 
@@ -39,7 +39,7 @@ create_rental_view = CreateRentalAPIView.as_view()
 
 
 class GetAllRentalsAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
     def get(self, _):
@@ -52,7 +52,7 @@ get_all_rentals_view = GetAllRentalsAPIView.as_view()
 
 
 class GetUserRentalsAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
     def get(self, _, user_id):
@@ -69,7 +69,7 @@ get_user_rentals_view = GetUserRentalsAPIView.as_view()
 
 
 class RentalDetailAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
     def get(self, _, rental_id):
@@ -80,19 +80,13 @@ class RentalDetailAPIView(GenericAPIView):
         serializer = self.serializer_class(rental)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, rental_id):
-        rental_owner = request.user
 
-        if Rental.objects.filter(id=rental_id).exists() == False:
-            raise ParseError(detail="This rental does not exist", code=404)
+rental_detail_view = RentalDetailAPIView.as_view()
 
-        rental_to_delete = Rental.objects.get(id=rental_id)
 
-        if rental_to_delete.user.id != rental_owner.id:
-            raise ParseError(detail="This user does not own this rental", code=401)
-
-        rental_to_delete.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class UpdateRentalAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.RentalSerializer
 
     def patch(self, request, rental_id):
         rental_owner = request.user
@@ -119,11 +113,33 @@ class RentalDetailAPIView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-rental_detail_view = RentalDetailAPIView.as_view()
+update_rental_view = UpdateRentalAPIView.as_view()
+
+
+class DeleteRentalAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.RentalSerializer
+
+    def delete(self, request, rental_id):
+        rental_owner = request.user
+
+        if Rental.objects.filter(id=rental_id).exists() == False:
+            raise ParseError(detail="This rental does not exist", code=404)
+
+        rental_to_delete = Rental.objects.get(id=rental_id)
+
+        if rental_to_delete.user.id != rental_owner.id:
+            raise ParseError(detail="This user does not own this rental", code=401)
+
+        rental_to_delete.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+delete_rental_view = DeleteRentalAPIView.as_view()
 
 
 class FilterRentalsAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
     def get(self, request):
