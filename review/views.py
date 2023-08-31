@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import ParseError
 from rest_framework import generics
 
@@ -44,7 +44,7 @@ create_user_review_view = CreateUserReviewAPIView.as_view()
 
 
 class GetUserReviewsAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.UserReviewSerializer
 
     def get(self, _, user_id):
@@ -112,7 +112,7 @@ create_rental_review_view = CreateRentalReviewAPIView.as_view()
 
 
 class GetRentalReviewsAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.RentalReviewSerializer
 
     def get(self, _, rental_id):

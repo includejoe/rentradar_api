@@ -18,6 +18,9 @@ class CreateRentalSerializer(serializers.ModelSerializer):
 class RentalSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(many=False)
 
+    def get_category(self, obj):
+        return obj.get_category_display()
+
     class Meta:
         model = Rental
         fields = "__all__"

@@ -87,8 +87,7 @@ class RateUserAPIView(generics.CreateAPIView):
     serializer_class = serializers.RatingSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        user_id = self.kwargs.get("user_id")
+    def create(self, request, user_id):
         rater = request.user
         value = request.data.get("value")
 

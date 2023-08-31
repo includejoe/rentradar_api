@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    bus_name = models.CharField(max_length=128, null=True)
+    bus_name = models.CharField(max_length=128, null=True, blank=True)
     password = models.CharField(max_length=128)
     phone = models.CharField(max_length=128, default="+233")
     gender = models.CharField(max_length=56, default="other")
@@ -124,13 +124,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return 0.0
 
-    def clean(self):
-        if self.user_type == 1:
-            if self.rating is not None:
-                raise ValidationError(
-                    {"rating": "This field must be null for a user of type 1"}
-                )
-
     class Meta:
         ordering = ["-created_at"]
 
@@ -138,10 +131,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Rating(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     rater = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="ratings_given"
+        User,
+        on_delete=models.CASCADE,
+        related_name="ratings_given",
     )
     user_rated = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="ratings_received"
+        User,
+        on_delete=models.CASCADE,
+        related_name="ratings_received",
     )
     value = models.PositiveSmallIntegerField(
         default=1,

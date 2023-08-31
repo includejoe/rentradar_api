@@ -10,5 +10,5 @@ urlpatterns = [
         public_user_details_view,
         name="public_user_details",
     ),
-    path("rate/<str:user_id>/", rate_user_view, name="rate"),
+    path("rate/<str:user_id>/", rate_user_view, name="rate-user"),
 ]

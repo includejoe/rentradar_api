@@ -7,7 +7,10 @@ from user.models import User
 class Conversation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     initiator = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="conversation_starter"
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="conversation_starter",
     )
     receiver = models.ForeignKey(
         User,
@@ -22,7 +25,10 @@ class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     sender = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="message_sender"
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="message_sender",
     )
     text = models.CharField(blank=True, max_length=1024)
     attachment = models.URLField(blank=True)

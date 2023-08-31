@@ -126,7 +126,14 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["full_name", "bus_name", "profile_image", "is_verified", "user_type"]
+        fields = [
+            "id",
+            "full_name",
+            "bus_name",
+            "profile_image",
+            "is_verified",
+            "user_type",
+        ]
 
 
 class UserSerializer(serializers.ModelSerializer):

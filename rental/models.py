@@ -1,7 +1,6 @@
 import uuid
 from django.db import models
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 
 from user.models import User
 
@@ -9,13 +8,13 @@ from user.models import User
 # Create your models here.
 class Rental(models.Model):
     CATEGORY_CHOICES = (
-        ("real-estate", "real-estate"),
-        ("vehicles", "vehicles"),
-        ("event-supplies", "event-supplies"),
-        ("fashion", "fashion"),
-        ("recreational", "recreational"),
-        ("sports", "sports"),
-        ("electronics", "electronics"),
+        ("real-estate", "Real Estate"),
+        ("vehicles", "Vehicles"),
+        ("event-supplies", "Event Supplies"),
+        ("fashion", "Fashion"),
+        ("recreational", "Recreational"),
+        ("sports", "Sports"),
+        ("electronics", "Electronics"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -28,7 +27,12 @@ class Rental(models.Model):
     )
     rate = models.CharField(max_length=128, blank=False, null=False)
     lease_term = models.CharField(max_length=255, blank=False, null=False)
-    lease_cost = models.CharField(max_length=128, blank=False, null=False)
+    lease_cost = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        null=False,
+        blank=False,
+    )
     image1 = models.URLField(blank=False, null=False)
     image2 = models.URLField(blank=False, null=False)
     image3 = models.URLField(blank=False, null=False)
