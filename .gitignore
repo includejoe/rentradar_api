@@ -33,3 +33,4 @@ pip-lock.txt
 *.DS_Store
 Thumbs.db
 joel_mbs_admin_private.pem
+requirements.txt
