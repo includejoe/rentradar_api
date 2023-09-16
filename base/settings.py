@@ -73,20 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "base.wsgi.application"
 
-# Local Database
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-# Remote Database
-# Using a Database URL
-# DATABASES = {
-#     "default": dj_database_url.config(default=env("DATABASE_URL"), conn_max_age=600)
-# }
-
 DATABASES = {
     "default": {
         "ENGINE": env("DATABASE_ENGINE"),
@@ -174,8 +160,7 @@ ASGI_APPLICATION = "base.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        # "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "BACKEND": "channels.layers.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
     }
 }
