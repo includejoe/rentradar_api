@@ -161,7 +161,8 @@ class UserSerializer(serializers.ModelSerializer):
             "rating",
             "is_verified",
             "user_status",
-            "last_login" "created_at",
+            "last_login",
+            "created_at",
         ]
 
         read_only_fields = ["id", "created_at" "full_name", "email", "last_login"]
