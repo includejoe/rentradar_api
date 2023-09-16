@@ -30,7 +30,10 @@ class LoginAPIView(generics.CreateAPIView):
 
     def post(self, request):
         user = request.data
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(
+            data=user,
+            context={"request": request},
+        )
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -45,12 +48,12 @@ class UserDetailsAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.UserSerializer
 
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request):
         # Return user on get request
         serializer = self.serializer_class(request.user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request):
         # Return updated user
         user = request.data
         serializer = self.serializer_class(

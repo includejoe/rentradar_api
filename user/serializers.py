@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from rest_framework import serializers
 from django.utils import timezone
 
@@ -95,6 +95,7 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ["email", "password", "jwt"]
 
     def validate(self, data):
+        request = self.context.get("request")
         email = data.get("email", None)
         password = data.get("password", None)
 
@@ -120,6 +121,7 @@ class LoginSerializer(serializers.ModelSerializer):
         elif user.user_status == 4:
             raise serializers.ValidationError("This user account has been deleted")
 
+        login(request, user)
         return user
 
 
@@ -159,10 +161,10 @@ class UserSerializer(serializers.ModelSerializer):
             "rating",
             "is_verified",
             "user_status",
-            "created_at",
+            "last_login" "created_at",
         ]
 
-        read_only_fields = ["id", "created_at" "full_name", "email"]
+        read_only_fields = ["id", "created_at" "full_name", "email", "last_login"]
 
     def update(self, instance, validated_data):
         password = validated_data.get("password", None)

@@ -6,9 +6,8 @@ from . import models
 # Register your models here.
 class User(admin.ModelAdmin):
     list_display = (
-        "id",
-        "full_name",
         "email",
+        "full_name",
         "phone",
         "gender",
         "user_type",
