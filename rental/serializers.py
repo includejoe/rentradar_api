@@ -17,6 +17,7 @@ class CreateRentalSerializer(serializers.ModelSerializer):
 
 class RentalSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(many=False)
+    category = serializers.SerializerMethodField()
 
     def get_category(self, obj):
         return obj.get_category_display()

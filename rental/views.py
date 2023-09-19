@@ -151,21 +151,34 @@ class FilterRentalsAPIView(GenericAPIView):
         min_term = request.query_params.get("min_term", None)
         max_term = request.query_params.get("max_term", None)
 
-        rentals = Rental.objects.all()
-        if title:
-            rentals = rentals.filter(title__icontains=title)
-        if location:
-            rentals = rentals.filter(location__icontains=location)
-        if category:
-            rentals = rentals.filter(category__icontains=category)
-        if min_rate:
-            rentals = rentals.filter(rate__gte=min_rate)
-        if max_rate:
-            rentals = rentals.filter(rate__lte=max_rate)
-        if min_term:
-            rentals = rentals.filter(lease_term_in_months__gte=min_term)
-        if max_term:
-            rentals = rentals.filter(lease_term_in_months__lte=max_term)
+        # if no query params are provided, return empty list
+        if (
+            title is None
+            and location is None
+            and category is None
+            and min_rate is None
+            and max_rate is None
+            and min_term is None
+            and max_term is None
+        ):
+            rentals = Rental.objects.filter(pk__in=[])
+        else:
+            rentals = Rental.objects.all()
+
+            if title:
+                rentals = rentals.filter(title__icontains=title)
+            if location:
+                rentals = rentals.filter(location__icontains=location)
+            if category:
+                rentals = rentals.filter(category__icontains=category)
+            if min_rate:
+                rentals = rentals.filter(rate__gte=min_rate)
+            if max_rate:
+                rentals = rentals.filter(rate__lte=max_rate)
+            if min_term:
+                rentals = rentals.filter(lease_term_in_months__gte=min_term)
+            if max_term:
+                rentals = rentals.filter(lease_term_in_months__lte=max_term)
 
         serializer = self.serializer_class(rentals, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
