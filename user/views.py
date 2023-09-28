@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, APIException
 from rest_framework import generics
 
-from .models import User, Rating
+from .models import User, Rating, UserKyc
 from . import serializers
 
 
@@ -19,9 +19,6 @@ class RegistrationAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-register_user_view = RegistrationAPIView.as_view()
 
 
 class LoginAPIView(generics.CreateAPIView):
@@ -39,9 +36,6 @@ class LoginAPIView(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-login_user_view = LoginAPIView.as_view()
 
 
 class UserDetailsAPIView(generics.RetrieveUpdateAPIView):
@@ -68,29 +62,23 @@ class UserDetailsAPIView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-user_details_view = UserDetailsAPIView.as_view()
-
-
 class PublicUserDetailsAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PublicUserSerializer
 
-    def get(self, _, user_id):
-        if User.objects.filter(id=user_id).exists() == False:
+    def get(self, _, email):
+        if User.objects.filter(email=email).exists() == False:
             raise ParseError(detail="This user does not exist", code=404)
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(email=email)
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-public_user_details_view = PublicUserDetailsAPIView.as_view()
 
 
 class RateUserAPIView(generics.CreateAPIView):
     serializer_class = serializers.RatingSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, user_id):
+    def create(self, request, email):
         rater = request.user
         value = request.data.get("value")
 
@@ -101,7 +89,7 @@ class RateUserAPIView(generics.CreateAPIView):
             )
 
         try:
-            user_rated = User.objects.get(id=user_id)
+            user_rated = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response(
                 {"detail": "The user you are trying to rate does not exist."},
@@ -127,4 +115,24 @@ class RateUserAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class UserKycAPIView(generics.CreateAPIView):
+    serializer_class = serializers.UserKycSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        data = request.data
+        data["user"] = request.user
+        try:
+            kyc = UserKyc.objects.create(**data)
+            serializer = self.serializer_class(kyc)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            raise APIException(detail=str(e))
+
+
+register_user_view = RegistrationAPIView.as_view()
+login_user_view = LoginAPIView.as_view()
+user_details_view = UserDetailsAPIView.as_view()
+public_user_details_view = PublicUserDetailsAPIView.as_view()
 rate_user_view = RateUserAPIView.as_view()
+user_kyc_view = UserKycAPIView.as_view()

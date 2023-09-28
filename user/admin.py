@@ -12,16 +12,18 @@ class User(admin.ModelAdmin):
         "gender",
         "user_type",
         "user_status",
-        "is_verified",
         "rating",
     )
-
-
-admin.site.register(models.User, User)
 
 
 class Rating(admin.ModelAdmin):
     list_display = ("id", "value")
 
 
+class UserKyc(admin.ModelAdmin):
+    list_display = ("id", "verified", "created_at")
+
+
+admin.site.register(models.User, User)
+admin.site.register(models.UserKyc, UserKyc)
 admin.site.register(models.Rating, Rating)

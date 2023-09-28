@@ -80,7 +80,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     location = models.CharField(max_length=255)
     id_card_image = models.URLField(null=True, blank=True)
     profile_image = models.URLField(null=True, blank=True)
-    is_verified = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     user_type = models.PositiveSmallIntegerField(
@@ -150,4 +149,18 @@ class Rating(models.Model):
             MinValueValidator(1),
             MaxValueValidator(5),
         ],
+    )
+
+
+class UserKyc(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    selfie_image = models.URLField(blank=False, null=False)
+    id_front_image = models.URLField(blank=False, null=False)
+    id_back_image = models.URLField(blank=False, null=False)
+    verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="kyc",
     )

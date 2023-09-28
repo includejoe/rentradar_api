@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from rest_framework import serializers
 from django.utils import timezone
 
-from .models import User, Rating
+from .models import User, Rating, UserKyc
 from base.utils import is_email_valid
 
 
@@ -90,10 +90,6 @@ class LoginSerializer(serializers.ModelSerializer):
         user = User.objects.get(email=obj.email)
         return user.tokens["access"]
 
-    class Meta:
-        model = User
-        fields = ["email", "password", "jwt"]
-
     def validate(self, data):
         request = self.context.get("request")
         email = data.get("email", None)
@@ -124,8 +120,21 @@ class LoginSerializer(serializers.ModelSerializer):
         login(request, user)
         return user
 
+    class Meta:
+        model = User
+        fields = ["email", "password", "jwt"]
+
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    is_kyc_verified = serializers.SerializerMethodField()
+
+    def get_is_kyc_verified(self, obj):
+        kyc = obj.kyc.first()
+        if kyc:
+            return kyc.verified
+        else:
+            return False
+
     class Meta:
         model = User
         fields = [
@@ -133,7 +142,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "full_name",
             "bus_name",
             "profile_image",
-            "is_verified",
             "user_type",
         ]
 
@@ -141,6 +149,31 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
     gender = serializers.SerializerMethodField()
+    is_kyc_verified = serializers.SerializerMethodField()
+
+    def get_is_kyc_verified(self, obj):
+        kyc = obj.kyc.first()
+        if kyc:
+            return kyc.verified
+        else:
+            return False
+
+    def get_gender(self, obj):
+        return obj.get_gender_display()
+
+    def update(self, instance, validated_data):
+        password = validated_data.get("password", None)
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        if password is not None:
+            instance.set_password(password)
+
+        instance.updated_at = timezone.now
+        instance.save()
+
+        return instance
 
     class Meta:
         model = User
@@ -160,34 +193,24 @@ class UserSerializer(serializers.ModelSerializer):
             "profile_image",
             "user_type",
             "rating",
-            "is_verified",
+            "is_kyc_verified",
             "user_status",
             "last_login",
             "created_at",
         ]
-
         read_only_fields = ["id", "created_at" "full_name", "email", "last_login"]
-
-    def get_gender(self, obj):
-        return obj.get_gender_display()
-
-    def update(self, instance, validated_data):
-        password = validated_data.get("password", None)
-
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-
-        if password is not None:
-            instance.set_password(password)
-
-        instance.updated_at = timezone.now
-        instance.save()
-
-        return instance
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
     gender = serializers.SerializerMethodField()
+    is_kyc_verified = serializers.SerializerMethodField()
+
+    def get_is_kyc_verified(self, obj):
+        kyc = obj.kyc.first()
+        if kyc:
+            return kyc.verified
+        else:
+            return False
 
     def get_gender(self, obj):
         return obj.get_gender_display()
@@ -200,9 +223,9 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "phone",
             "gender",
             "location",
+            "is_kyc_verified",
             "rating",
             "created_at",
-            "is_verified",
             "profile_image",
             "user_type",
         ]
@@ -213,3 +236,14 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ("id", "user_rated", "rater", "value")
         read_only_fields = ("id", "user_rated", "rater")
+
+
+class UserKycSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.user.email
+
+    class Meta:
+        model = UserKyc
+        fields = "__all__"
