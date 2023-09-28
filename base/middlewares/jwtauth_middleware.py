@@ -4,7 +4,7 @@ from channels.middleware import BaseMiddleware
 from channels.generic.http import AsyncHttpConsumer
 
 from user.models import User
-from base.utils.jwt_decoder import decode_jwt
+from base.utils import decode_jwt
 
 
 @database_sync_to_async

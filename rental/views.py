@@ -7,6 +7,7 @@ from rest_framework.generics import GenericAPIView
 from . import serializers
 from .models import Rental
 from user.models import User
+from base.utils import action_response
 
 
 # Create your views here.
@@ -35,53 +36,49 @@ class CreateRentalAPIView(GenericAPIView):
             raise APIException(detail=e)
 
 
-create_rental_view = CreateRentalAPIView.as_view()
-
-
 class GetAllRentalsAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
-    def get(self, _):
+    def get(self, request):
         rentals = Rental.objects.all()
-        serializer = self.serializer_class(rentals, many=True)
+        serializer = self.serializer_class(
+            rentals,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-get_all_rentals_view = GetAllRentalsAPIView.as_view()
 
 
 class GetUserRentalsAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
-    def get(self, _, user_id):
+    def get(self, request, user_id):
         if User.objects.filter(id=user_id).exists() == False:
             raise ParseError(detail="This user does not exist", code=404)
 
         user = User.objects.get(id=user_id)
         rentals = Rental.objects.filter(user=user)
-        serializer = self.serializer_class(rentals, many=True)
+        serializer = self.serializer_class(
+            rentals,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-get_user_rentals_view = GetUserRentalsAPIView.as_view()
 
 
 class RentalDetailAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = serializers.RentalSerializer
 
-    def get(self, _, rental_id):
+    def get(self, request, rental_id):
         if Rental.objects.filter(id=rental_id).exists() == False:
             raise ParseError(detail="This rental does not exist", code=404)
 
         rental = Rental.objects.get(id=rental_id)
-        serializer = self.serializer_class(rental)
+        serializer = self.serializer_class(rental, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-rental_detail_view = RentalDetailAPIView.as_view()
 
 
 class UpdateRentalAPIView(GenericAPIView):
@@ -113,9 +110,6 @@ class UpdateRentalAPIView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-update_rental_view = UpdateRentalAPIView.as_view()
-
-
 class DeleteRentalAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.RentalSerializer
@@ -132,10 +126,10 @@ class DeleteRentalAPIView(GenericAPIView):
             raise ParseError(detail="This user does not own this rental", code=401)
 
         rental_to_delete.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-delete_rental_view = DeleteRentalAPIView.as_view()
+        return Response(
+            action_response(success=True, info="Rental deleted successfully"),
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
 class FilterRentalsAPIView(GenericAPIView):
@@ -180,8 +174,62 @@ class FilterRentalsAPIView(GenericAPIView):
             if max_term:
                 rentals = rentals.filter(lease_term_in_months__lte=max_term)
 
-        serializer = self.serializer_class(rentals, many=True)
+        serializer = self.serializer_class(
+            rentals,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserFavoritesAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.RentalSerializer
+
+    def get(self, request):
+        user = request.user
+        rentals = user.favorites.all()
+        serializer = self.serializer_class(
+            rentals,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        user = request.user
+        rental_id = request.data.get("rental_id", None)
+
+        if rental_id is None:
+            raise ParseError(detail="rental_id is required", code=400)
+
+        if Rental.objects.filter(id=rental_id).exists() == False:
+            raise ParseError(detail="This rental does not exist", code=404)
+
+        rental = Rental.objects.get(id=rental_id)
+
+        if user.favorites.filter(id=rental_id).exists():
+            user.favorites.remove(rental)
+            info = "This rental has been removed from favorites successfully"
+        else:
+            user.favorites.add(rental)
+            info = "This rental has been added to favorites successfully"
+
+        user.save()
+        return Response(
+            action_response(
+                success=True,
+                info=info,
+            ),
+            status=status.HTTP_200_OK,
+        )
+
+
+create_rental_view = CreateRentalAPIView.as_view()
+get_all_rentals_view = GetAllRentalsAPIView.as_view()
+get_user_rentals_view = GetUserRentalsAPIView.as_view()
+rental_detail_view = RentalDetailAPIView.as_view()
+update_rental_view = UpdateRentalAPIView.as_view()
+delete_rental_view = DeleteRentalAPIView.as_view()
 filter_rentals_view = FilterRentalsAPIView.as_view()
+user_favorites_view = UserFavoritesAPIView.as_view()

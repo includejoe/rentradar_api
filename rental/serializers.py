@@ -18,13 +18,18 @@ class CreateRentalSerializer(serializers.ModelSerializer):
 class RentalSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(many=False)
     category = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
+
+    def get_is_favorited(self, obj):
+        user = self.context["request"].user
+        return user in obj.favorited_by.all()
 
     def get_category(self, obj):
         return obj.get_category_display()
 
     class Meta:
         model = Rental
-        fields = "__all__"
+        exclude = ["favorited_by"]
 
         read_only_fields = ["id", "user", "created_at"]
 

@@ -33,6 +33,12 @@ class Rental(models.Model):
         null=False,
         blank=False,
     )
+    favorited_by = models.ManyToManyField(
+        User,
+        blank=True,
+        symmetrical=False,
+        related_name="favorites",
+    )
     image1 = models.URLField(blank=False, null=False)
     image2 = models.URLField(blank=False, null=False)
     image3 = models.URLField(blank=False, null=False)

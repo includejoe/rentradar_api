@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils import timezone
 
 from .models import User, Rating
-from base.utils.email_validator import is_email_valid
+from base.utils import is_email_valid
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

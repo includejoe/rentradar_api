@@ -7,6 +7,7 @@ from .views import (
     update_rental_view,
     delete_rental_view,
     filter_rentals_view,
+    user_favorites_view,
 )
 
 app_name = "rental"
@@ -19,4 +20,5 @@ urlpatterns = [
     path("delete/<str:rental_id>/", delete_rental_view, name="delete_rental"),
     path("user/<str:user_id>/", get_user_rentals_view, name="user_rentals"),
     path("filter/", filter_rentals_view, name="filter_rentals"),
+    path("favorites/", user_favorites_view, name="user_favorites"),
 ]
