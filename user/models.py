@@ -66,6 +66,8 @@ class UserManager(BaseUserManager):
 
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDER_CHOICES = (("male", "Male"), ("female", "Female"), ("other", "Other"))
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=128)
@@ -73,7 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     bus_name = models.CharField(max_length=128, null=True, blank=True)
     password = models.CharField(max_length=128)
     phone = models.CharField(max_length=128, default="+233")
-    gender = models.CharField(max_length=56, default="other")
+    gender = models.CharField(max_length=56, default="other", choices=GENDER_CHOICES)
     dob = models.DateField(null=True)
     location = models.CharField(max_length=255)
     id_card_image = models.URLField(null=True, blank=True)

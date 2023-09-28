@@ -140,6 +140,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    gender = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -167,6 +168,9 @@ class UserSerializer(serializers.ModelSerializer):
 
         read_only_fields = ["id", "created_at" "full_name", "email", "last_login"]
 
+    def get_gender(self, obj):
+        return obj.get_gender_display()
+
     def update(self, instance, validated_data):
         password = validated_data.get("password", None)
 
@@ -183,6 +187,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
+    gender = serializers.SerializerMethodField()
+
+    def get_gender(self, obj):
+        return obj.get_gender_display()
+
     class Meta:
         model = User
         fields = [
