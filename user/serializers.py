@@ -247,4 +247,4 @@ class UserKycSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserKyc
-        fields = "__all__"
+        exclude = ["verified"]
