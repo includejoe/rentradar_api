@@ -32,8 +32,8 @@ class JWTAuthMiddleware(BaseMiddleware):
                 token = headers[b"authorization"]
                 scope["user"] = await get_user(token)
             except Exception as e:
-                return error_response(e)
+                return error_response(self, e)
         else:
-            return error_response("JWT not found")
+            return error_response(self, "JWT not found")
 
         return await super().__call__(scope, receive, send)

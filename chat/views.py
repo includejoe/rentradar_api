@@ -12,11 +12,11 @@ from user.models import User
 
 
 # Create your views here.
-class StartConversationAPIView(generics.RetrieveAPIView):
+class StartConversationAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.ConversationSerializer
 
-    def retrieve(self, request, receiver_id):
+    def create(self, request, receiver_id):
         try:
             receiver = User.objects.get(id=receiver_id)
         except User.DoesNotExist:
