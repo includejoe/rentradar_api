@@ -137,7 +137,8 @@ class KycStatusAPIView(generics.RetrieveAPIView):
     def retrieve(self, request):
         try:
             kyc = UserKyc.objects.get(user=request.user)
-            return Response({"verified": kyc.verified}, status=status.HTTP_200_OK)
+            serializer = self.serializer_class(kyc)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except UserKyc.DoesNotExist:
             return Response({"verified": False}, status=status.HTTP_200_OK)
 
