@@ -47,7 +47,7 @@ class UserDetailsAPIView(generics.RetrieveUpdateAPIView):
         serializer = self.serializer_class(request.user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def update(self, request):
+    def patch(self, request):
         # Return updated user
         user = request.data
         serializer = self.serializer_class(

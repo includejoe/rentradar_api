@@ -142,6 +142,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "full_name",
             "bus_name",
             "is_kyc_verified",
+            "phone",
             "profile_image",
             "user_type",
         ]
