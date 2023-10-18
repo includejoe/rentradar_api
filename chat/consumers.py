@@ -2,14 +2,15 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-
 from .models import Message, Conversation
+from user.models import User
 from .serializers import GetMessageSerializer
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["conversation_id"]
+        self.sender_id = self.scope["url_route"]["kwargs"]["sender_id"]
         self.room_group_name = f"chat{self.room_name}"
 
         # Join room group
@@ -45,7 +46,7 @@ class ChatConsumer(WebsocketConsumer):
         )
 
         conversation = Conversation.objects.get(id=str(self.room_name))
-        sender = self.scope["user"]
+        sender = User.objects.get(id=self.sender_id)
 
         # Attachment
         if attachment:

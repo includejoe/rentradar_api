@@ -142,7 +142,7 @@ SIMPLE_JWT = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ["https://marketyapi.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = []
 
 # Documentation
 SWAGGER_SETTINGS = {
