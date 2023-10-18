@@ -74,6 +74,10 @@ class ChatConsumer(WebsocketConsumer):
 
             # Send message to WebSocket
             self.send(text_data=json.dumps(serializer.data))
+        else:
+            serializer = GetMessageSerializer(similar_messages.first())
+            # Send message to WebSocket
+            self.send(text_data=json.dumps(serializer.data))
 
 
 chat_consumer_asgi = ChatConsumer.as_asgi()
