@@ -4,6 +4,7 @@ from .views import (
     public_user_details_view,
     rate_user_view,
     user_kyc_view,
+    kyc_status_view,
 )
 
 app_name = "user"
@@ -17,4 +18,5 @@ urlpatterns = [
     ),
     path("rate/<str:email>/", rate_user_view, name="rate-user"),
     path("kyc/", user_kyc_view, name="user-kyc"),
+    path("kyc/status/", kyc_status_view, name="kyc-status-view"),
 ]

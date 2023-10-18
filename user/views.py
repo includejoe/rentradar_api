@@ -130,9 +130,22 @@ class UserKycAPIView(generics.CreateAPIView):
             raise APIException(detail=str(e))
 
 
+class KycStatusAPIView(generics.RetrieveAPIView):
+    serializer_class = serializers.UserKycSerializer
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request):
+        try:
+            kyc = UserKyc.objects.get(user=request.user)
+            return Response({"verified": kyc.verified}, status=status.HTTP_200_OK)
+        except UserKyc.DoesNotExist:
+            return Response({"verified": False}, status=status.HTTP_200_OK)
+
+
 register_user_view = RegistrationAPIView.as_view()
 login_user_view = LoginAPIView.as_view()
 user_details_view = UserDetailsAPIView.as_view()
 public_user_details_view = PublicUserDetailsAPIView.as_view()
 rate_user_view = RateUserAPIView.as_view()
 user_kyc_view = UserKycAPIView.as_view()
+kyc_status_view = KycStatusAPIView.as_view()
