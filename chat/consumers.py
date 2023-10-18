@@ -53,23 +53,17 @@ class ChatConsumer(WebsocketConsumer):
         # to avoid duplicate messages
         time_threshold = datetime.now() - timedelta(minutes=1)
         similar_messages = Message.objects.filter(
-            text=message_text, sender=sender, created_at__gte=time_threshold
+            text=message_text,
+            sender=sender,
+            created_at__gte=time_threshold,
         )
 
         if not similar_messages.exists():
-            # Attachment
-            if attachment:
-                message = Message.objects.create(
-                    sender=sender,
-                    attachment=attachment,
-                    text=message_text,
-                    conversation=conversation,
-                )
-            else:
-                message = Message.objects.create(
-                    sender=sender, text=message_text, conversation=conversation
-                )
-
+            message = Message.objects.create(
+                sender=sender,
+                text=message_text,
+                conversation=conversation,
+            )
             serializer = GetMessageSerializer(message)
 
             # Send message to WebSocket
