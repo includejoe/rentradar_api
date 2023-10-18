@@ -1,6 +1,8 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from datetime import datetime, timedelta
+
 
 from .models import Message, Conversation
 from user.models import User
@@ -48,20 +50,27 @@ class ChatConsumer(WebsocketConsumer):
         conversation = Conversation.objects.get(id=str(self.room_name))
         sender = User.objects.get(id=self.sender_id)
 
-        # Attachment
-        if attachment:
-            message = Message.objects.create(
-                sender=sender,
-                attachment=attachment,
-                text=message_text,
-                conversation=conversation,
-            )
-        else:
-            message = Message.objects.create(
-                sender=sender, text=message_text, conversation=conversation
-            )
+        # to avoid duplicate messages
+        time_threshold = datetime.now() - timedelta(minutes=1)
+        similar_messages = Message.objects.filter(
+            text=message_text, sender=sender, created_at__gte=time_threshold
+        )
 
-        serializer = GetMessageSerializer(message)
+        if not similar_messages.exists():
+            # Attachment
+            if attachment:
+                message = Message.objects.create(
+                    sender=sender,
+                    attachment=attachment,
+                    text=message_text,
+                    conversation=conversation,
+                )
+            else:
+                message = Message.objects.create(
+                    sender=sender, text=message_text, conversation=conversation
+                )
+
+            serializer = GetMessageSerializer(message)
 
         # Send message to WebSocket
         self.send(text_data=json.dumps(serializer.data))
