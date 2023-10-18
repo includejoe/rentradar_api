@@ -2,8 +2,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.db.models import Q
 
 from . import serializers
@@ -30,13 +28,8 @@ class StartConversationAPIView(generics.CreateAPIView):
         )
 
         if conversation.exists():
-            return redirect(
-                reverse(
-                    "chat:get_conversation",
-                    kwargs={"conversation_id": str(conversation[0].id)},
-                ),
-                method="GET",
-            )
+            serializer = self.serializer_class(conversation)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             conversation = Conversation.objects.create(
                 initiator=request.user, receiver=receiver
