@@ -58,20 +58,20 @@ class ChatConsumer(WebsocketConsumer):
             created_at__gte=time_threshold,
         )
 
-        if not similar_messages.exists():
-            message = Message.objects.create(
-                sender=sender,
-                text=message_text,
-                conversation=conversation,
-            )
-            serializer = GetMessageSerializer(message)
+        # if not similar_messages.exists():
+        message = Message.objects.create(
+            sender=sender,
+            text=message_text,
+            conversation=conversation,
+        )
+        serializer = GetMessageSerializer(message)
 
-            # Send message to WebSocket
-            self.send(text_data=json.dumps(serializer.data))
-        else:
-            serializer = GetMessageSerializer(similar_messages.first())
-            # Send message to WebSocket
-            self.send(text_data=json.dumps(serializer.data))
+        # Send message to WebSocket
+        self.send(text_data=json.dumps(serializer.data))
+        # else:
+        #     serializer = GetMessageSerializer(similar_messages.first())
+        #     # Send message to WebSocket
+        #     self.send(text_data=json.dumps(serializer.data))
 
 
 chat_consumer_asgi = ChatConsumer.as_asgi()
