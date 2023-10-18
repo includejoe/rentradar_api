@@ -28,7 +28,7 @@ class StartConversationAPIView(generics.CreateAPIView):
         )
 
         if conversation.exists():
-            serializer = self.serializer_class(conversation)
+            serializer = self.serializer_class(conversation.first())
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             conversation = Conversation.objects.create(
