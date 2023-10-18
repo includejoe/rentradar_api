@@ -15,7 +15,7 @@ admin.site.register(models.Conversation, Conversation)
 
 
 class Message(admin.ModelAdmin):
-    list_display = ("id", "text", "attachment", "created_at")
+    list_display = ("id", "text", "created_at")
 
 
 admin.site.register(models.Message, Message)

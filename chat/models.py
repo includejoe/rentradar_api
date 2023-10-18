@@ -31,7 +31,6 @@ class Message(models.Model):
         related_name="message_sender",
     )
     text = models.CharField(blank=True, max_length=1024)
-    attachment = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
