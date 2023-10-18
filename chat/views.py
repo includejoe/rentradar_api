@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import APIException
 from rest_framework import generics
 from django.db.models import Q
 
@@ -17,25 +18,27 @@ class StartConversationAPIView(generics.CreateAPIView):
     def create(self, request, receiver_id):
         try:
             receiver = User.objects.get(id=receiver_id)
+
+            conversation = Conversation.objects.filter(
+                Q(initiator=request.user, receiver=receiver)
+                | Q(initiator=receiver, receiver=request.user)
+            )
+
+            if conversation.exists():
+                serializer = self.serializer_class(conversation.first())
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                conversation = Conversation.objects.create(
+                    initiator=request.user, receiver=receiver
+                )
+                serializer = self.serializer_class(conversation)
+                return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(
                 {"detail": "You cannot start a conversation with a non existent user"}
             )
-
-        conversation = Conversation.objects.filter(
-            Q(initiator=request.user, receiver=receiver)
-            | Q(initiator=receiver, receiver=request.user)
-        )
-
-        if conversation.exists():
-            serializer = self.serializer_class(conversation.first())
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            conversation = Conversation.objects.create(
-                initiator=request.user, receiver=receiver
-            )
-            serializer = self.serializer_class(conversation)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            raise APIException(detail=str(e))
 
 
 start_conversation_view = StartConversationAPIView.as_view()
@@ -48,11 +51,12 @@ class GetConversationAPIView(generics.RetrieveAPIView):
     def retrieve(self, _, conversation_id):
         try:
             conversation = Conversation.objects.get(id=conversation_id)
+            serializer = self.serializer_class(conversation)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response({"detail": "This Conversation does not exist"})
-
-        serializer = self.serializer_class(conversation)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            raise APIException(detail=str(e))
 
 
 get_conversation_view = GetConversationAPIView.as_view()
