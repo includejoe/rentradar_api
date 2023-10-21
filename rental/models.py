@@ -44,11 +44,6 @@ class Rental(models.Model):
     image3 = models.URLField(blank=False, null=False)
     image4 = models.URLField(blank=True, null=True)
     image5 = models.URLField(blank=True, null=True)
-    image6 = models.URLField(null=True, blank=True)
-    image7 = models.URLField(null=True, blank=True)
-    image8 = models.URLField(null=True, blank=True)
-    image9 = models.URLField(null=True, blank=True)
-    image10 = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
